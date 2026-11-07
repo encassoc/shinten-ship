@@ -1,0 +1,35 @@
+{
+  "name": "shinten-ship",
+  "version": "0.1.0",
+  "description": "The shipping desk for shinten: opens sealed delivery addresses on the desk's own device and writes the carrier's label-import CSV, so the store never holds an address in the clear.",
+  "license": "Apache-2.0",
+  "repository": "github:joeartsea/shinten-ship",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "bin": {
+    "shinten-ship": "dist/src/cli.js",
+    "shinten-ship-mcp": "dist/src/mcp.js"
+  },
+  "files": [
+    "dist/src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test \"dist/test/**/*.test.js\"",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "iconv-lite": "^0.6.3",
+    "shinten": "github:joeartsea/shinten",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0"
+  }
+}
