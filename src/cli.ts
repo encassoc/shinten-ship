@@ -11,6 +11,7 @@
 // input. What was made and purged is recorded, by digest, in
 // SHINTEN_SHIP_RECORDS (default ~/.shinten-ship/records.jsonl).
 import { readFile, writeFile } from 'node:fs/promises';
+import { isMain } from './main.js';
 import { parseArgs } from 'node:util';
 import type { JWK } from 'jose';
 import { carrier, carriers } from './carriers/index.js';
@@ -69,7 +70,7 @@ async function main(argv: string[]): Promise<number> {
   }
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (isMain(import.meta.url)) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (e: Error) => {

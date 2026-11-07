@@ -6,6 +6,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { readFile, writeFile } from 'node:fs/promises';
+import { isMain } from './main.js';
 import type { JWK } from 'jose';
 import { z } from 'zod';
 import { carrier, carriers } from './carriers/index.js';
@@ -91,7 +92,7 @@ export function deskServer(opts: DeskOptions): McpServer {
   return server;
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (isMain(import.meta.url)) {
   deskServer({ keyPath: process.env.SHINTEN_KEY, configPath: process.env.SHINTEN_SHIP_CONFIG })
     .connect(new StdioServerTransport())
     .catch((e: Error) => {

@@ -29,3 +29,13 @@ test('labels and purge on the command line, with records by digest', async () =>
   assert.equal(records[0].file, records[1].file);
   assert.match((await cli('carriers')).stdout, /yamato-b2[\s\S]*japanpost-r/);
 });
+
+test('the CLI runs through a symlink, as npm installs a bin', async () => {
+  const { symlink } = await import('node:fs/promises');
+  const { resolve } = await import('node:path');
+  const dir = await mkdtemp(join(tmpdir(), 'shinten-ship-bin-'));
+  const link = join(dir, 'shinten-ship');
+  await symlink(resolve('dist/src/cli.js'), link);
+  const { stdout } = await run(process.execPath, [link, 'carriers']);
+  assert.match(stdout, /yamato-b2/);
+});
