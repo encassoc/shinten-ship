@@ -2,7 +2,7 @@
 
 **The shipping desk for shinten: open sealed addresses where labels are made, and nowhere else.**
 
-A store that seals delivery addresses with [shinten](https://github.com/encassoc/shinten)
+A store that seals delivery addresses with [shinten](https://github.com/eucassoc/shinten)
 keeps only the postal code and an envelope per order. Someone still has
 to print the label. shinten-ship is that someone's tool: it runs on the
 shipping desk's own device, opens each order's envelope with the desk's
