@@ -2,7 +2,7 @@
 
 **shinten の出荷デスク。封じた住所を、送り状を作る場所でだけ開く。**
 
-[shinten](https://github.com/joeartsea/shinten) で配送先を封じている店舗は、
+[shinten](https://github.com/encassoc/shinten) で配送先を封じている店舗は、
 注文ごとに郵便番号と封筒しか持ちません。それでも誰かが送り状を印字します。
 shinten-ship はその誰かの道具です。出荷担当の端末で動き、各注文の封筒を
 その端末の秘密鍵で開き、配送業者の送り状ソフトがそのまま受け付ける取込ファイルを
