@@ -109,6 +109,13 @@ shinten-ship purge labels.csv
 
 業者の形式は業者の都合で変わります。形式は `src/carriers/` の1ファイルです。
 
+## 例
+
+[shinten の web-shop の例](https://github.com/eucassoc/shinten/tree/main/examples/web-shop)
+で、架空のネットショップの出荷担当の端末を動かせます。暗号化された注文からヤマト運輸
+B2クラウドの取込ファイルを作り、印刷後に削除し、サイトが承認していない鍵を配っていた
+ときには止まります。流れは[約2分の動画](https://github.com/eucassoc/shinten/blob/main/examples/web-shop/demo.mp4)で見られます。
+
 ## 開発
 
 ```sh

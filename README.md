@@ -115,6 +115,15 @@ and each purge. No address is ever in a record.
 Carrier formats change on the carriers' schedule; a format is one file
 under `src/carriers/`.
 
+## Example
+
+[shinten's web-shop example](https://github.com/eucassoc/shinten/tree/main/examples/web-shop)
+runs the desk on a fictional shop: Yamato B2 Cloud labels from encrypted
+orders, the file deleted after printing, and the stop when the site has
+served a key the desk never approved.
+[A two-minute video](https://github.com/eucassoc/shinten/blob/main/examples/web-shop/demo.mp4)
+walks through it.
+
 ## Development
 
 ```sh
