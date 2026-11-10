@@ -29,7 +29,7 @@ shinten-ship はその誰かの道具です。出荷担当の端末で動き、�
 
 ```sh
 npm install -g shinten-ship
-shinten keygen > desk.json          # shinten の鍵。公開側を店舗のフォームの宛先として公開する
+shinten keygen -o desk.json         # shinten の鍵。公開側を店舗のフォームの宛先として公開する
 ```
 
 `ship.json` に差出人と業者のアカウントを書きます。
@@ -38,9 +38,17 @@ shinten keygen > desk.json          # shinten の鍵。公開側を店舗のフ�
 {
   "sender": { "name": "株式会社テスト商店", "postalCode": "100-0001", "address": "東京都千代田区千代田1-1", "building": "テストビル3F", "phone": "03-1234-5678" },
   "yamato": { "customerCode": "123456789", "fareCode": "01" },
-  "japanpost": { "mailType": "0" }
+  "japanpost": { "mailType": "0" },
+  "recipients": { "keys": [ { "kty": "EC", "crv": "P-256", "...": "この発送窓口" }, { "kty": "EC", "crv": "P-256", "...": "控えの鍵" } ] }
 }
 ```
+
+`recipients` は、店舗のフォームが封じるはずの公開鍵を、この発送窓口が承認したものです。
+他の鍵にも封じられた注文や、これらの鍵が欠けた注文は、店舗のサイトの鍵一覧が
+差し替えられたことを意味します。ラベルは一つも作られず、`labels` は STOP で終わります。
+同じ鍵で `shinten watch -r` を定期的に店舗の鍵一覧に向けて実行すれば、注文が来る前に
+差し替えを見つけられます。
+
 
 ヤマトの `customerCode` は B2クラウド契約のご請求先顧客コード、`fareCode` は
 運賃管理番号です。請求先コードに3桁の分類がある場合は `classCode` を足します。

@@ -52,7 +52,13 @@ async function main(argv: string[]): Promise<number> {
       const config = parseConfig(await readFile(need(values.config ?? process.env.SHINTEN_SHIP_CONFIG, '--config or SHINTEN_SHIP_CONFIG'), 'utf8'));
       const orders = parseOrders(await readText(positionals[0]));
       const out = values.out ?? `labels-${c.id}-${new Date().toISOString().slice(0, 10)}.csv`;
+      if (!config.recipients) console.error('warning: ship.json has no recipients; orders are not checked against the keys this desk approved');
       const r = await makeLabels({ orders, carrier: c, config, key, recorder: new JsonlRecorder() });
+      if (r.alarm) {
+        for (const p of r.problems) console.error(`order ${p.order}: ${p.problem}`);
+        console.error(`STOP: ${r.alarm}`);
+        return 3;
+      }
       await writeFile(out, r.file, { mode: 0o600 });
       for (const p of r.problems) console.error(`order ${p.order}: ${p.problem}`);
       console.error(`${r.written.length} of ${orders.length} orders written to ${out} (sha256 ${r.digest.slice(0, 12)}); ${c.note}`);

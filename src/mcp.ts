@@ -68,6 +68,7 @@ export function deskServer(opts: DeskOptions): McpServer {
       const c = carrier(id);
       const source = orders.trimStart().startsWith('[') || orders.trimStart().startsWith('{') || orders.includes('\n') ? orders : decodeCsv(await readFile(orders));
       const r = await makeLabels({ orders: parseOrders(source), carrier: c, config: await config(), key: await key(), recorder });
+      if (r.alarm) throw new Error(`STOP: ${r.alarm} Tell the person running the desk.`);
       await writeFile(out, r.file, { mode: 0o600 });
       const result = { out, digest: r.digest, written: r.written, problems: r.problems, note: c.note };
       return { ...text(result), structuredContent: result };

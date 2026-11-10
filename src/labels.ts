@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { JWK } from 'jose';
-import { open } from 'shinten';
+import { open, RecipientError } from 'shinten';
 import type { Carrier, Delivery } from './carrier.js';
 import type { Config } from './config.js';
 import { encodeCsv, formatCsv } from './csv.js';
@@ -21,6 +21,12 @@ export interface Labels {
   written: { id: string; envelope: string }[];
   /** Orders left out, and why. */
   problems: Problem[];
+  /**
+   * Set when an order was sealed to keys the desk did not approve: the key
+   * list on the store's site was replaced. No labels are written; stop and
+   * check the site before opening anything more.
+   */
+  alarm?: string;
 }
 
 export interface MakeLabelsOptions {
@@ -49,16 +55,18 @@ export async function makeLabels(opts: MakeLabelsOptions): Promise<Labels> {
   const rows: string[][] = [opts.carrier.header];
   const written: Labels['written'] = [];
   const problems: Problem[] = [];
+  const alarmed: string[] = [];
   for (const order of opts.orders) {
     const envelope = sha256(JSON.stringify(order.envelope));
     let delivery: Delivery;
     try {
-      const opened = await open({ clear: { postalCode: order.postalCode }, envelope: order.envelope }, opts.key);
+      const opened = await open({ clear: { postalCode: order.postalCode }, envelope: order.envelope }, opts.key, opts.config.recipients ? { recipients: opts.config.recipients } : {});
       if (opened.profile !== 'shipping') throw new Error(`envelope profile is ${opened.profile}, not shipping`);
       const f = opened.fields;
       delivery = { name: f.name ?? '', address: f.address ?? '', phone: f.phone ?? '', postalCode: order.postalCode, ...(f.building ? { building: f.building } : {}) };
     } catch (e) {
       problems.push({ order: order.id, problem: (e as Error).message });
+      if (e instanceof RecipientError) alarmed.push(order.id);
       continue;
     }
     const r = opts.carrier.row(order, delivery, opts.config, today);
@@ -68,6 +76,13 @@ export async function makeLabels(opts: MakeLabelsOptions): Promise<Labels> {
     }
     rows.push(r.cells);
     written.push({ id: order.id, envelope });
+  }
+  if (alarmed.length) {
+    // One order sealed to a stranger's key means every order since the key
+    // list changed may have been: make nothing, and say so.
+    const alarm = `orders ${alarmed.join(', ')} were sealed to keys this desk did not approve: the key list on the store's site may have been replaced. No labels were made. Check the site's keys (shinten watch) before opening anything more.`;
+    const file = encodeCsv(formatCsv([opts.carrier.header]), opts.carrier.encoding);
+    return { file, digest: sha256(file), written: [], problems, alarm };
   }
   const file = encodeCsv(formatCsv(rows), opts.carrier.encoding);
   const digest = sha256(file);

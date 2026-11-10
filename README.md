@@ -32,7 +32,7 @@ alone cannot be opened by anyone.
 
 ```sh
 npm install -g shinten-ship
-shinten keygen > desk.json          # from shinten; publish the public half as a recipient of the store's forms
+shinten keygen -o desk.json         # from shinten; publish the public half as a recipient of the store's forms
 ```
 
 `ship.json` holds the sender and the carrier accounts:
@@ -41,9 +41,17 @@ shinten keygen > desk.json          # from shinten; publish the public half as a
 {
   "sender": { "name": "株式会社テスト商店", "postalCode": "100-0001", "address": "東京都千代田区千代田1-1", "building": "テストビル3F", "phone": "03-1234-5678" },
   "yamato": { "customerCode": "123456789", "fareCode": "01" },
-  "japanpost": { "mailType": "0" }
+  "japanpost": { "mailType": "0" },
+  "recipients": { "keys": [ { "kty": "EC", "crv": "P-256", "...": "this desk" }, { "kty": "EC", "crv": "P-256", "...": "the backup" } ] }
 }
 ```
+
+`recipients` are the public keys the store's forms are meant to seal to, as
+this desk approved them. An order sealed to any other key, or missing one of
+these, means the key list on the store's site was replaced: no labels are
+made, and `labels` exits with STOP. Run `shinten watch -r` on the same keys
+against the store's key list on a schedule, to find a replacement before
+any order.
 
 For Yamato, `customerCode` is the ご請求先顧客コード and `fareCode` the
 運賃管理番号 from your B2 Cloud contract; add `classCode` when the billing

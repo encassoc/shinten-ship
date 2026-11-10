@@ -96,3 +96,34 @@ test('orders come as JSON, JSON Lines or CSV', async () => {
   assert.equal(parseOrders(csv)[0]?.count, 2);
   assert.throws(() => parseOrders('[{"id":"x"}]'), /postalCode is required/);
 });
+
+test('an order sealed to a key the desk did not approve stops the whole batch: the store\'s key list was replaced', async () => {
+  const { seal } = await import('shinten');
+  const key = await desk();
+  const backup = await desk();
+  const thief = await desk();
+  const approved = { ...config, recipients: [key.publicJwk, backup.publicJwk] };
+  const sealedTo = async (id: string, to: typeof key[]) => {
+    const s = await seal('shipping', { postalCode: '150-0001', name: '山田 太郎', address: '東京都渋谷区神宮前1-2-3', phone: '090-1234-5678' }, to.map((k) => k.publicJwk));
+    return { id, postalCode: s.clear.postalCode as string, envelope: s.envelope, item: '雑貨' };
+  };
+  const fine = await sealedTo('A-1', [key, backup]);
+  const ok = await makeLabels({ orders: [fine], carrier: yamatoB2, config: approved, key: key.privateJwk, now });
+  assert.equal(ok.written.length, 1);
+  assert.equal(ok.alarm, undefined);
+  // After A-1, the site's key list gained the thief's key.
+  const stolen = await sealedTo('A-2', [key, backup, thief]);
+  const r = await makeLabels({ orders: [fine, stolen], carrier: yamatoB2, config: approved, key: key.privateJwk, now });
+  assert.match(r.alarm ?? '', /A-2.*did not approve/);
+  assert.deepEqual(r.written, []);
+  assert.equal(parseCsv(decodeCsv(r.file)).length, 1); // the header only: no address leaves the envelope
+});
+
+test('ship.json takes the approved keys as a JWK Set or a list, public keys only', async () => {
+  const { parseConfig } = await import('../src/config.js');
+  const key = await desk();
+  const base = { sender: config.sender };
+  assert.equal(parseConfig(JSON.stringify({ ...base, recipients: { keys: [key.publicJwk] } })).recipients?.length, 1);
+  assert.equal(parseConfig(JSON.stringify({ ...base, recipients: [key.publicJwk] })).recipients?.length, 1);
+  assert.throws(() => parseConfig(JSON.stringify({ ...base, recipients: [key.privateJwk] })), /public keys/);
+});
