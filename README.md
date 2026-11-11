@@ -124,6 +124,18 @@ served a key the desk never approved.
 [A two-minute video](https://github.com/eucassoc/shinten/blob/main/examples/web-shop/demo.mp4)
 walks through it.
 
+Each step, from receipt to decryption and deletion, is also recorded with
+[deedlog](https://github.com/eucassoc/deedlog) and cosigned by two witnesses,
+so running the example needs its `dlog` command (Go required):
+
+```sh
+go install github.com/eucassoc/deedlog/cmd/dlog@latest
+
+git clone https://github.com/eucassoc/shinten && cd shinten/examples/web-shop
+npm install
+npm start          # http://127.0.0.1:8800/
+```
+
 ## Development
 
 ```sh

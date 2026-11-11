@@ -116,6 +116,18 @@ shinten-ship purge labels.csv
 B2クラウドの取込ファイルを作り、印刷後に削除し、サイトが承認していない鍵を配っていた
 ときには止まります。流れは[約2分の動画](https://github.com/eucassoc/shinten/blob/main/examples/web-shop/demo.mp4)で見られます。
 
+受付から復号、削除までの各手順は [deedlog](https://github.com/eucassoc/deedlog) で記録し、
+二つの連署サーバーが連署します。そのため、例を動かすには `dlog` コマンドが必要です
+（Go が必要です）。
+
+```sh
+go install github.com/eucassoc/deedlog/cmd/dlog@latest
+
+git clone https://github.com/eucassoc/shinten && cd shinten/examples/web-shop
+npm install
+npm start          # http://127.0.0.1:8800/
+```
+
 ## 開発
 
 ```sh
