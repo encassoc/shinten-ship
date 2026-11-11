@@ -1,6 +1,6 @@
 {
   "name": "shinten-ship",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "The shipping desk for shinten: opens sealed delivery addresses on the desk's own device and writes the carrier's label-import CSV, so the store never holds an address in the clear.",
   "license": "Apache-2.0",
   "repository": "github:eucassoc/shinten-ship",
